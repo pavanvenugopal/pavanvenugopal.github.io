@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>PVG TERMINAL — Pavan Venu Gopal</title>
+<meta name="description" content="Pavan Venu Gopal — fund accounting, valuation & financial modelling. Cork, Ireland.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0e; --panel: #12141a; --panel2: #171a22; --line: #23262f;
+    --text: #e6e7ea; --muted: #8b8f9a; --faint: #5a5e69;
+    --amber: #ff9e1b; --amber-dim: #b8720f; --green: #26d07c; --red: #ff5247; --blue: #4d9fff;
+    --mono: 'IBM Plex Mono', monospace; --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.6; font-size: 15px;
+    background-image: radial-gradient(ellipse at 70% 0%, rgba(255,158,27,.05), transparent 55%); }
+  .mono { font-family: var(--mono); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 4vw; }
+  .amber { color: var(--amber); } .green { color: var(--green); } .red { color: var(--red); }
+
+  /* Terminal top bar */
+  .termbar { background: #000; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px;
+    position: sticky; top: 0; z-index: 60; }
+  .termbar .inner { max-width: 1180px; margin: 0 auto; padding: 9px 4vw; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .termbar .cmd { color: var(--amber); font-weight: 600; letter-spacing: 0.02em; }
+  .termbar .cmd .go { background: var(--amber); color: #000; padding: 1px 6px; border-radius: 2px; margin-left: 8px; font-weight: 600; }
+  .cursor { display: inline-block; width: 8px; height: 15px; background: var(--amber); margin-left: 4px; vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .termbar .status { color: var(--muted); display: flex; gap: 16px; align-items: center; }
+  .termbar .status .live { color: var(--green); }
+  .termbar .status .dot { color: var(--green); animation: pulse 2s ease infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+  @media (max-width: 680px) { .termbar .status .hideS { display: none; } }
+
+  /* Ticker tape */
+  .ticker { background: var(--panel); border-bottom: 1px solid var(--line); overflow: hidden; white-space: nowrap; font-family: var(--mono); font-size: 12.5px; position: sticky; top: 37px; z-index: 55; }
+  .ticker .track { display: inline-block; padding: 8px 0; animation: scroll 42s linear infinite; }
+  .ticker:hover .track { animation-play-state: paused; }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .ticker .item { display: inline-block; padding: 0 22px; color: var(--muted); }
+  .ticker .item b { color: var(--text); font-weight: 500; }
+  .ticker .sym { color: var(--amber); }
+  @media (prefers-reduced-motion: reduce) { .ticker .track { animation: none; } }
+
+  /* Function-key nav */
+  .fkeys { background: #000; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; position: sticky; top: 70px; z-index: 54; }
+  .fkeys .inner { max-width: 1180px; margin: 0 auto; padding: 0 4vw; display: flex; gap: 2px; flex-wrap: wrap; }
+  .fkeys a { color: var(--muted); text-decoration: none; padding: 10px 16px; border-bottom: 2px solid transparent; transition: all .15s; letter-spacing: 0.02em; }
+  .fkeys a:hover { color: var(--amber); background: var(--panel); }
+  .fkeys a b { color: var(--amber); margin-right: 6px; }
+  .fkeys .kbhint { margin-left: auto; align-self: center; color: var(--faint); font-size: 11px; letter-spacing: 0.04em; padding-right: 4px; }
+  @media (max-width: 680px) { .fkeys .kbhint { display: none; } }
+
+  /* Hero */
+  .hero { padding: 84px 0 60px; }
+  .hero .path { font-family: var(--mono); font-size: 13px; color: var(--faint); margin-bottom: 22px; }
+  .hero .path .amber { color: var(--amber); }
+  .nameplate { margin-bottom: 20px; }
+  .nameplate .rl { font-size: clamp(11.5px, 1.4vw, 13px); font-weight: 500; letter-spacing: 0.14em; color: var(--muted);
+    margin-bottom: 18px; text-transform: uppercase; }
+  .nameplate .rl .amber { color: var(--amber); } .nameplate .rl .green { color: var(--green); }
+  .nameplate .nm { font-size: clamp(42px, 9vw, 104px); font-weight: 600; letter-spacing: -0.02em; color: var(--text);
+    line-height: 0.98; text-shadow: 0 0 60px rgba(255,158,27,.18); }
+  .nameplate .nm .amber { color: var(--amber); }
+  .hero h1 { font-family: var(--mono); font-size: clamp(19px, 2.8vw, 30px); line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; color: var(--muted); margin-top: 22px; }
+  .hero h1 .hl { color: var(--amber); }
+  .hero .typed::after { content: '_'; color: var(--amber); animation: blink 1.1s steps(1) infinite; }
+  .hero .sub { color: var(--muted); font-size: clamp(15px, 2vw, 18px); max-width: 60ch; margin-top: 22px; }
+  .hero .cta-row { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { font-family: var(--mono); display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 4px; font-size: 13.5px; font-weight: 500; cursor: pointer; border: 1px solid var(--line); text-decoration: none; transition: all .2s; background: var(--panel); color: var(--text); }
+  .btn:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-amber { background: var(--amber); color: #000; border-color: var(--amber); font-weight: 600; }
+  .btn-amber:hover { background: #ffb347; color: #000; }
+
+  /* Metric panels */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 56px; }
+  @media (max-width: 680px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+  .metric { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 20px; position: relative; }
+  .metric::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px; background: var(--amber); border-radius: 2px; }
+  .metric .n { font-family: var(--mono); font-size: 30px; font-weight: 600; color: var(--amber); }
+  .metric .l { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+
+  section { padding: 70px 0; }
+  .sec-head { margin-bottom: 32px; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  .sec-head .fkey { font-family: var(--mono); font-size: 12px; color: #000; background: var(--amber); padding: 3px 9px; border-radius: 3px; font-weight: 600; }
+  .sec-head h2 { font-family: var(--mono); font-size: clamp(22px, 3.4vw, 30px); font-weight: 600; letter-spacing: -0.01em; }
+  .sec-head .desc { flex-basis: 100%; color: var(--muted); font-size: 15px; margin-top: 4px; }
+
+  /* Positions blotter */
+  .pos-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .pos-hdr { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px; padding: 11px 22px; background: #000; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; }
+  .pos-hdr span:last-child { text-align: right; }
+  .pos-row { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px 16px; align-items: center; padding: 20px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s, box-shadow .18s; position: relative; }
+  .pos-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); transition: width .18s; }
+  .pos-row:last-child { border-bottom: none; }
+  .pos-row:hover { background: var(--panel2); box-shadow: inset 0 0 50px rgba(255,158,27,.05); }
+  .pos-row:hover::before { width: 3px; }
+  .pos-row .peek { grid-column: 1 / -1; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .28s ease, opacity .22s ease, margin-top .28s ease; font-size: 13px; color: var(--muted); }
+  .pos-row:hover .peek { max-height: 70px; opacity: 1; margin-top: 4px; }
+  .pos-row .peek b { color: var(--amber); }
+  .pos-row .peek .hint { color: var(--faint); font-family: var(--mono); font-size: 11.5px; }
+  .pos-row .role { font-weight: 600; font-size: 16px; }
+  .pos-row .stat-dot { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+  .pos-row .stat-dot.active { color: var(--green); } .pos-row .stat-dot.active .d { animation: pulse 2s ease infinite; }
+  .pos-row .stat-dot.prior { color: var(--amber); }
+  .pos-row .emp { font-family: var(--mono); color: var(--amber); font-size: 14px; font-weight: 500; }
+  .pos-row .mandate { color: var(--muted); font-size: 13.5px; margin-top: 3px; }
+  .pos-row .tenure { font-family: var(--mono); text-align: right; font-size: 13px; }
+  .pos-row .tenure .dt { color: var(--text); } .pos-row .tenure .loc { color: var(--faint); font-size: 12px; margin-top: 3px; }
+  @media (max-width: 680px) { .pos-hdr { display: none; } .pos-row { grid-template-columns: 1fr; gap: 8px; } .pos-row .tenure { text-align: left; } }
+
+  /* Securities table */
+  .sec-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .sec-row { display: grid; grid-template-columns: 110px 1fr 130px 40px; gap: 16px; align-items: center; padding: 18px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s, box-shadow .18s; position: relative; }
+  .sec-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); transition: width .18s; }
+  .sec-row:last-child { border-bottom: none; }
+  .sec-row:hover { background: var(--panel2); box-shadow: inset 0 0 50px rgba(255,158,27,.05); }
+  .sec-row:hover::before { width: 3px; }
+  .sec-row .peek { grid-column: 1 / -1; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .28s ease, opacity .22s ease, margin-top .28s ease; font-size: 13px; color: var(--muted); }
+  .sec-row:hover .peek { max-height: 70px; opacity: 1; margin-top: 4px; }
+  .sec-row .peek b { color: var(--amber); }
+  .sec-row .peek .hint { color: var(--faint); font-family: var(--mono); font-size: 11.5px; }
+  .sec-row .sym { font-family: var(--mono); font-weight: 600; color: var(--amber); font-size: 15px; }
+  .sec-row .sym .ex { color: var(--faint); font-size: 11px; display: block; font-weight: 400; margin-top: 2px; }
+  .sec-row .desc-c .nm { font-weight: 600; font-size: 16px; }
+  .sec-row .desc-c .tl { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .sec-row .stat { font-family: var(--mono); text-align: right; }
+  .sec-row .stat .v { color: var(--green); font-weight: 600; font-size: 15px; }
+  .sec-row .stat .k { color: var(--faint); font-size: 11px; margin-top: 2px; }
+  .sec-row .go { font-family: var(--mono); color: var(--faint); text-align: right; font-size: 18px; transition: color .15s, transform .15s; }
+  .sec-row:hover .go { color: var(--amber); transform: translateX(3px); }
+  @media (max-width: 680px) { .sec-row { grid-template-columns: 80px 1fr 60px; } .sec-row .stat { display: none; } }
+
+  /* Finale */
+  .finale { border: 1px solid var(--amber-dim); border-radius: 8px; padding: 40px; background: linear-gradient(135deg, rgba(255,158,27,.06), var(--panel)); }
+  .finale .tag { font-family: var(--mono); font-size: 12px; color: var(--amber); border: 1px solid var(--amber-dim); padding: 4px 11px; border-radius: 3px; }
+  .finale h3 { font-family: var(--mono); font-size: clamp(22px, 3.4vw, 30px); font-weight: 600; margin: 18px 0 12px; }
+  .finale p { color: var(--muted); max-width: 64ch; }
+  .finale .req { margin-top: 22px; }
+
+  /* Overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.78); backdrop-filter: blur(3px); z-index: 100; display: none; align-items: flex-start; justify-content: center; padding: 6vh 4vw; overflow-y: auto; }
+  .overlay.open { display: flex; }
+  .detail { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; max-width: 740px; width: 100%; position: relative; animation: pop .25s ease; }
+  @keyframes pop { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .detail .dhead { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--line); background: #000; border-radius: 8px 8px 0 0; }
+  .detail .dhead .sym { font-family: var(--mono); color: var(--amber); font-weight: 600; font-size: 16px; }
+  .detail .dhead .sym .desc { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 10px; }
+  .detail .close { background: none; border: 1px solid var(--line); color: var(--muted); width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-size: 16px; font-family: var(--mono); transition: all .2s; }
+  .detail .close:hover { color: var(--amber); border-color: var(--amber); }
+  .detail .dbody { padding: 26px 24px; }
+  .detail h3 { font-family: var(--mono); font-size: 24px; font-weight: 600; margin-bottom: 10px; }
+  .detail .syn { color: var(--muted); font-size: 15px; margin-bottom: 8px; }
+  .detail h4 { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--amber); margin: 26px 0 12px; }
+  .detail ul { list-style: none; }
+  .detail li { font-size: 14.5px; padding: 9px 0 9px 20px; position: relative; border-bottom: 1px solid var(--line); }
+  .detail li:last-child { border: none; }
+  .detail li::before { content: '▸'; color: var(--amber); position: absolute; left: 0; font-family: var(--mono); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-family: var(--mono); background: var(--panel2); border: 1px solid var(--line); color: var(--muted); font-size: 12.5px; padding: 6px 12px; border-radius: 4px; }
+  .chip b { color: var(--amber); }
+  .credits { margin-top: 24px; padding: 16px 18px; background: #000; border: 1px solid var(--line); border-radius: 6px; font-size: 13.5px; color: var(--muted); font-style: italic; font-family: var(--mono); }
+  .credits::before { content: '// '; color: var(--amber); }
+  .detail .request { margin-top: 20px; }
+
+  /* Model terminal */
+  .model { background: #000; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .model .mhead { background: var(--panel); border-bottom: 1px solid var(--line); padding: 12px 22px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; }
+  .model .mhead .amber { font-weight: 600; }
+  .model .mbody { padding: 30px 24px; }
+  .model .val { font-family: var(--mono); font-size: 60px; font-weight: 600; color: var(--text); line-height: 1; }
+  .model .val .pct { color: var(--amber); }
+  .model .subvals { display: flex; gap: 26px; margin-top: 14px; flex-wrap: wrap; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .model .subvals b { color: var(--green); }
+  .model .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 26px; margin-top: 32px; }
+  .model label { font-family: var(--mono); font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 9px; }
+  .model label b { color: var(--amber); }
+  input[type=range] { width: 100%; accent-color: var(--amber); height: 4px; }
+  .model .note { font-family: var(--mono); font-size: 12.5px; color: var(--faint); margin-top: 26px; line-height: 1.6; }
+  .model .note::before { content: '> '; color: var(--amber); }
+
+  /* Profile */
+  .profile { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .pcard { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 24px; transition: border-color .2s; }
+  .pcard:hover { border-color: var(--amber-dim); }
+  .pcard .field { font-family: var(--mono); font-size: 11.5px; color: var(--amber); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+  .pcard p { color: var(--muted); font-size: 14px; }
+  .siuu-btn { font-family: var(--mono); margin-top: 14px; background: transparent; border: 1px solid var(--amber-dim); color: var(--amber); font-weight: 500; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all .15s; }
+  .siuu-btn:hover { background: var(--amber); color: #000; }
+  .siuu-btn:active { transform: scale(.95); }
+
+  footer { border-top: 1px solid var(--line); padding: 70px 0 90px; }
+  footer .cmdline { font-family: var(--mono); color: var(--faint); font-size: 14px; margin-bottom: 26px; }
+  footer .cmdline .amber { color: var(--amber); }
+  footer h3 { font-family: var(--mono); font-size: clamp(26px, 4vw, 40px); font-weight: 600; margin-bottom: 12px; }
+  footer .fsub { color: var(--muted); max-width: 48ch; margin-bottom: 26px; }
+  footer .contact-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  footer .contact-row a { font-family: var(--mono); color: var(--text); text-decoration: none; font-size: 13.5px; padding: 11px 20px; border: 1px solid var(--line); border-radius: 4px; transition: all .2s; }
+  footer .contact-row a:hover { border-color: var(--amber); color: var(--amber); }
+  footer .fine { font-family: var(--mono); margin-top: 44px; font-size: 12px; color: var(--faint); }
+
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  #toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--amber); color: #000; font-family: var(--mono); font-weight: 600; padding: 11px 24px; border-radius: 4px; opacity: 0; transition: all .3s; z-index: 200; font-size: 13.5px; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .cursor, .hero .typed::after { animation: none; } }
+</style>
+</head>
+<body>
+
+<div class="termbar"><div class="inner">
+  <span class="cmd">PVG<span class="go">GO</span><span class="cursor"></span></span>
+  <span class="status mono">
+    <span class="hideS">CORK, IE</span>
+    <span class="hideS" id="clock">--:--:--</span>
+    <span><span class="dot">●</span> <span class="live">LIVE</span></span>
+  </span>
+</div></div>
+
+<div class="ticker"><div class="track mono" id="tickTrack"></div></div>
+
+<nav class="fkeys"><div class="inner">
+  <a href="#top"><b>F1</b>OVERVIEW</a>
+  <a href="#experience"><b>F2</b>EXPERIENCE</a>
+  <a href="#work"><b>F3</b>WORK</a>
+  <a href="#model"><b>F4</b>MODEL</a>
+  <a href="#profile"><b>F5</b>PROFILE</a>
+  <a href="#contact"><b>F6</b>CONTACT</a>
+  <span class="kbhint">press 1–6 to navigate</span>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="nameplate">
+    <div class="rl mono">FUND OPERATIONS &amp; FINANCE <span class="amber">//</span> CORK, IE <span class="amber">//</span> <span class="green">AVAILABLE NOW</span></div>
+    <div class="nm mono">PAVAN<br>VENU GOPAL<span class="amber">.</span></div>
+  </div>
+  <h1 class="mono">The fund accountant who <span class="hl typed" id="typed"></span></h1>
+  <p class="sub">Fund accounting, valuation, and financial modelling — delivered like a terminal, because the numbers earned it. One analyst, thousands of transactions, a refusal to let a single figure go unexplained.</p>
+  <div class="cta-row">
+    <a href="#experience" class="btn btn-amber">F2 &middot; VIEW EXPERIENCE</a>
+    <a href="#contact" class="btn">DOWNLOAD CV</a>
+  </div>
+  <div class="metrics">
+    <div class="metric reveal"><div class="n" data-count="196">0</div><div class="l">BONDS ANALYSED</div></div>
+    <div class="metric reveal"><div class="n" data-count="1000">0</div><div class="l">MONTE CARLO SIMS</div></div>
+    <div class="metric reveal"><div class="n" data-count="70" data-suffix="+">0</div><div class="l">QUERIES / WEEK</div></div>
+    <div class="metric reveal"><div class="n" data-count="3">0</div><div class="l">VALUATIONS, 1 STOCK</div></div>
+  </div>
+</div></header>
+
+<section id="experience"><div class="wrap">
+  <div class="sec-head reveal">
+    <span class="fkey">F2</span>
+    <h2 class="mono">POSITIONS // EXPERIENCE</h2>
+    <p class="desc">Live and prior roles. The real jobs behind the models — click any row for the full mandate.</p>
+  </div>
+  <div class="pos-table reveal">
+    <div class="pos-hdr"><span>POSITION</span><span>MANDATE</span><span>TENURE</span></div>
+    <div id="posTable"></div>
+  </div>
+</div></section>
+
+<section id="work"><div class="wrap">
+  <div class="sec-head reveal">
+    <span class="fkey">F3</span>
+    <h2 class="mono">SECURITIES // THE WORK</h2>
+    <p class="desc">Three analyses, every number verified against source files. Click any row to pull up the full readout — files available on request. The MSc thesis below is the headline act.</p>
+  </div>
+  <div class="sec-table reveal" id="secTable"></div>
+</div></section>
+
+<section id="finale" style="padding-top:0;"><div class="wrap">
+  <div class="finale reveal">
+    <span class="tag mono">MSc THESIS</span>
+    <h3 class="mono">Benchmarking 30 companies across a $450bn industry</h3>
+    <p>My MSc thesis: a large-scale benchmarking study of the global Beauty &amp; Personal Care industry, supervised by Dr Conor Neville. A 30-company comparable analysis on EV/EBITDA (17.6x avg), ESG scores (53.4 avg) and operating metrics, with top-10 deep-dives from P&amp;G to Estée Lauder, performance traced across four market eras, company-by-company sustainability analysis, and the full strategic framework treatment — Porter's Five Forces, SWOT, PESTEL. The full manuscript is available on request.</p>
+    <div class="req"><a class="btn btn-amber" href="mailto:pavanvgopal06@gmail.com?subject=Requesting%20the%20MSc%20thesis%20(Beauty%20%26%20Personal%20Care%20benchmarking)">REQUEST MANUSCRIPT</a></div>
+  </div>
+</div></section>
+
+<section id="model"><div class="wrap">
+  <div class="sec-head reveal">
+    <span class="fkey">F4</span>
+    <h2 class="mono">WACC // NG:LN ANALYTICS</h2>
+    <p class="desc">Domain expansion: infinite spreadsheet. The live structure of my National Grid cost-of-capital model — 196 bonds, a hand-built beta regression, €99bn invested capital. Sliders start at my actual inputs.</p>
+  </div>
+  <div class="model reveal">
+    <div class="mhead"><span><span class="amber">NG:LN</span> NATIONAL GRID PLC</span><span>WACC ANALYTICS &middot; DEC 2023</span></div>
+    <div class="mbody">
+      <div class="val" id="waccVal">6.05<span class="pct">%</span></div>
+      <div class="subvals">
+        <span>COE <b id="coeOut">10.43%</b></span>
+        <span>COD (post-tax) <b id="codOut">3.61%</b></span>
+        <span>STRUCT <b style="color:var(--amber)">64D / 36E</b></span>
+      </div>
+      <div class="controls">
+        <div><label>EQUITY BETA <b id="betaOut">1.193</b></label><input type="range" id="beta" min="0.6" max="1.8" step="0.001" value="1.193"></div>
+        <div><label>EQUITY RISK PREMIUM <b id="erpOut">5.5%</b></label><input type="range" id="erp" min="3" max="8" step="0.1" value="5.5"></div>
+        <div><label>RISK-FREE (30Y) <b id="rfOut">3.87%</b></label><input type="range" id="rf" min="1" max="6" step="0.01" value="3.87"></div>
+        <div><label>WTD BOND YTM <b id="ytmOut">4.45%</b></label><input type="range" id="ytm" min="2" max="8" step="0.05" value="4.45"></div>
+        <div><label>TAX RATE <b id="taxOut">19%</b></label><input type="range" id="tax" min="10" max="30" step="1" value="19"></div>
+      </div>
+      <p class="note mono" id="waccNote">Beta 1.193 from regressing 60 months of returns vs the FTSE — R2 0.83, built cell by cell. Bond YTM weighted across six maturities, 5 to 30 years.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="profile"><div class="wrap">
+  <div class="sec-head reveal">
+    <span class="fkey">F5</span>
+    <h2 class="mono">PROFILE // OFF THE CLOCK</h2>
+    <p class="desc">The fields a CV schema has no column for.</p>
+  </div>
+  <div class="profile">
+    <div class="pcard reveal">
+      <div class="field">TRAINING_MONTAGE</div>
+      <p>Weights are my favourite things to play. Gym most mornings — not because it's fun at 6am, but because the reps count whether you feel like it or not. Same rule applies to reconciliations.</p>
+    </div>
+    <div class="pcard reveal">
+      <div class="field">ALMA_MATER</div>
+      <p>Cristiano is my alma mater. Twenty years of doing the unglamorous basics daily — the greatest highlight reel ever built on repetition.</p>
+      <button class="siuu-btn" id="siuu">SIUUU &times; <span id="siuuCount">0</span></button>
+    </div>
+    <div class="pcard reveal">
+      <div class="field">NOW_STREAMING</div>
+      <p>The Office, Brooklyn Nine-Nine, Friends, The Big Bang Theory, Seinfeld — on loop. Seinfeld made a show about nothing; this is a portfolio about something. Bears. Beets. Balance sheets.</p>
+    </div>
+    <div class="pcard reveal">
+      <div class="field">GENRE_SHELF</div>
+      <p>Horror and Jujutsu Kaisen, mostly. One teaches you to stay calm when things get scary, the other that mastering your domain takes years of training. Both apply directly to month-end close.</p>
+    </div>
+    <div class="pcard reveal">
+      <div class="field">PILOT_EPISODE</div>
+      <p>India to Cork for an MSc in Corporate Finance at UCC. Stayed for the career, the football, and — against all expectations — the weather jokes.</p>
+    </div>
+  </div>
+</div></section>
+
+<footer id="contact"><div class="wrap">
+  <div class="cmdline mono">PVG:CONTACT &gt; <span class="amber">EXECUTE</span> &gt; _</div>
+  <h3 class="mono">Let's talk.</h3>
+  <p class="fsub">Open to fund operations and finance roles across Ireland. The next chapter needs a good opening line.</p>
+  <div class="contact-row">
+    <a href="mailto:pavanvgopal06@gmail.com?subject=Saw%20your%20terminal">pavanvgopal06@gmail.com</a>
+    <a href="https://www.linkedin.com/in/pavan-venu-gopal-22bb6631a/" target="_blank" rel="noopener">LINKEDIN</a>
+    <a href="Pavan_VenuGopal_CV.pdf" download>DOWNLOAD CV</a>
+  </div>
+  <p class="fine">(C) 2026 PAVAN VENU GOPAL &middot; CORK, IE &middot; FULL WORK AUTHORISATION, NO VISA TIMELINE &middot; THE ONLY JUMP SCARE HERE IS AN UNRECONCILED LEDGER.</p>
+</div></footer>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="detail" id="detailBox"></div></div>
+<div id="toast"></div>
+
+<script>
+  const POSITIONS = [
+    {
+      status: 'active', statusLabel: '● ACTIVE', role: 'Financial Services Advisor', emp: 'UISCE ÉIREANN',
+      mandate: 'Regulated B2B financial services — business account management, KYC, billing reconciliation',
+      dates: 'APR 2026 – PRESENT', loc: 'Cork, IE',
+      syn: 'Current role: managing business clients and their account issues (B2B) inside a regulated financial services environment, keeping the reconciliation and compliance muscles sharp while targeting fund operations.',
+      build: [
+        'Manage 70+ business account queries per week (B2B), resolving billing and account issues within strict SLA deadlines',
+        'Mandatory KYC identity verification on 100% of interactions before any account is accessed',
+        'Investigate and reconcile billing discrepancies and payment irregularities across business accounts via Oracle CRM',
+        'Handle business payment processing and structured arrangements; maintain a full audit trail on every escalation'
+      ],
+      chips: ['<b>B2B</b> accounts', '<b>70+</b> queries/wk', '<b>100%</b> KYC checked', '<b>Oracle CRM</b>'],
+      credits: 'Not fund accounting on paper — but B2B client servicing, reconciliation, compliance and volume under pressure are exactly the same reflexes. Currently employed, Cork-based, no visa timeline.',
+      request: 'Requesting details on your Uisce Éireann role'
+    },
+    {
+      status: 'prior', statusLabel: '● PRIOR', role: 'Fund Accountant', emp: 'VEGA MANAGEMENT',
+      mandate: 'Daily NAV, IFRS reconciliations & investor reporting across 4–8 fund portfolios',
+      dates: 'JUL 2023 – AUG 2024', loc: 'India',
+      syn: 'The professional foundation: a year as a Fund Accountant where reconciliation wasn\u2019t a task on the side of the job — it was the job.',
+      build: [
+        'Daily and monthly NAV calculation across 4–8 fund portfolios (₹100–300 Cr combined AUM)',
+        'Transaction processing and position reconciliations in line with IFRS',
+        'Financial statements and year-end accounts for multiple fund structures',
+        'Investor and regulatory reporting, coordinating with fund managers and legal counsel',
+        'Legacy data cleanup during new fund onboarding — sitting with mismatched records until every discrepancy had an explanation'
+      ],
+      chips: ['<b>4–8</b> portfolios', '<b>₹100–300 Cr</b> AUM', '<b>3–5 day</b> query turnaround', '<b>IFRS</b>'],
+      credits: 'The month-end close got faster the longer I was there. Correlation is not causation, but I have my suspicions.',
+      request: 'Requesting details on your Vega Management fund accounting work'
+    }
+  ];
+
+  const SECURITIES = [
+    {
+      sym: 'NG:LN', ex: 'LSE', nm: 'The one where beta hit 1.193', tl: 'Cost of capital build',
+      stat: '6.05%', statk: 'WACC DERIVED',
+      syn: 'A full cost-of-capital build on National Grid Plc: every input traced to source, every calculation built cell by cell.',
+      build: [
+        '60 months of stock returns regressed against the FTSE — returns, covariance and variance decomposition built manually, with SLOPE() used only to check the arithmetic',
+        'Beta 1.193, R2 0.83, with systematic vs unsystematic variance split out',
+        '196 National Grid bonds pulled from Refinitiv Eikon (~£39bn outstanding); six sampled across 5–30 year maturities',
+        'Weighted average YTM of 4.45% → after-tax cost of debt of 3.61% at a 19% tax rate',
+        'CAPM cost of equity of 10.43% (30yr risk-free 3.87% + beta × 5.5% ERP)',
+        'WACC of 6.05% across €99.07bn invested capital (64% debt / 36% equity)'
+      ],
+      chips: ['<b>196</b> bonds', '<b>β 1.193</b> · R2 0.83', '<b>4.45%</b> YTM', '<b>6.05%</b> WACC', '<b>€99bn</b> capital'],
+      credits: 'The interactive WACC terminal in F3 is this exact model. Go break it.',
+      request: 'Requesting the National Grid cost of capital model'
+    },
+    {
+      sym: 'PG:US', ex: 'NYSE', nm: 'The P&G trilogy', tl: 'Three valuations, one stock',
+      stat: '$139.98–161.72', statk: 'INTRINSIC RANGE',
+      syn: 'Procter & Gamble valued three independent ways — because one model is an opinion, three models are a case.',
+      build: [
+        'Part I, fact sheet: 5 years of share price vs the S&P 500 Consumer Staples, beta of 1.005 derived manually (correlation 81.48%), plus a full ratio suite — ROE ~30–32%, liquidity, leverage, turnover',
+        'Part II, DDM: 10-year dividend forecast from the $3.96 FY24 base, growth tapering 6% → 4.7% (IMF GDP + Cleveland Fed inflation), Gordon Growth terminal value → intrinsic $139.98 vs market $168.03: overvalued',
+        'Part III, DCF: P&G\u2019s 2024 statements feeding a 5-year FCF forecast (revenue growth 4% → 3.5%, EBIT margin 22%), WACC 6.29% → intrinsic $161.72 vs price $161.03: fair value to the dollar',
+        'Part IV, comps: EV/EBITDA vs Colgate, Kimberly-Clark, Unilever and Church & Dwight; industry median 15.4x → implied $142.25',
+        'Sensitivity tables on every model — WACC × terminal growth for the DCF, cost of equity × growth for the DDM'
+      ],
+      chips: ['DDM <b>$139.98</b>', 'DCF <b>$161.72</b>', 'Comps <b>$142.25</b>', 'Mkt <b>~$161–168</b>'],
+      credits: 'My DCF and the market agreed to within 69 cents. Either the model was good or the universe was being polite. I\u2019ve chosen to believe the model.',
+      request: 'Requesting the P&G valuation models (DDM, DCF, comps)'
+    },
+    {
+      sym: 'HFOPT', ex: 'PORT', nm: 'Monte Carlo, no casino', tl: 'Hedge fund portfolio optimisation',
+      stat: '+0.224', statk: 'SHARPE UPLIFT',
+      syn: 'A hedge fund portfolio optimisation: diagnose an existing allocation, add a diversifier, optimise, then simulate.',
+      build: [
+        'Diagnosed the old portfolio (Convertible Arbitrage + Equity Long/Short): Sharpe 0.363, skew −1.53, kurtosis 8.88, max drawdown −9.87%',
+        'Added CTAs as the diversifier — 7.06% annualised return with near-zero correlation to the existing strategies',
+        'Solver-optimised weights: 52.1% Conv Arb / 20.8% Equity L/S / 27.0% CTA, minimising volatility to 4.66%',
+        'Result: Sharpe 0.363 → 0.587, portfolio correlation with the S&P down from 0.74 to 0.56',
+        '1,000 Monte Carlo simulations on the new allocation: expected return, VaR, and probability-of-loss distributions'
+      ],
+      chips: ['Sharpe <b>0.363→0.587</b>', 'Corr <b>0.74→0.56</b>', '<b>1,000</b> sims', 'Wts <b>52/21/27</b>'],
+      credits: 'Group project. I did a disproportionate share of the Excel. My teammates would agree, which is how you know it\u2019s true.',
+      request: 'Requesting the portfolio optimisation model'
+    }
+  ];
+
+  // Ticker tape
+  const tickItems = [
+    ['VEGA','NAV RECONCILED','▲'], ['NG:LN','WACC 6.05%','▲'], ['PG:US','FV $161.72','▲'],
+    ['HFOPT','SHARPE 0.587','▲'], ['THESIS','30 COS · $450BN','▲'], ['β','1.193','●'], ['BONDS','196','●'],
+    ['SIMS','1,000','●'], ['QUERIES','70+/WK','▲'], ['STATUS','AVAILABLE NOW','▲']
+  ];
+  const tick = tickItems.map(([s,v,a]) =>
+    `<span class="item"><span class="sym">${s}</span> <b>${v}</b> <span class="${a==='▲'?'green':'amber'}">${a}</span></span>`).join('');
+  document.getElementById('tickTrack').innerHTML = tick + tick;
+
+  // Positions blotter
+  const posTbl = document.getElementById('posTable');
+  POSITIONS.forEach((p, i) => {
+    const r = document.createElement('div');
+    r.className = 'pos-row';
+    r.tabIndex = 0;
+    r.innerHTML = `
+      <div>
+        <div class="stat-dot ${p.status}"><span class="d">●</span> ${p.statusLabel.replace('● ','')}</div>
+        <div class="role">${p.role}</div>
+      </div>
+      <div><div class="emp">${p.emp}</div><div class="mandate">${p.mandate}</div></div>
+      <div class="tenure"><div class="dt">${p.dates}</div><div class="loc">${p.loc}</div></div>
+      <div class="peek">${p.syn.split('—')[0].split(':').slice(1).join(':').trim() || p.syn} <span class="hint">▸ click for full readout</span></div>`;
+    const open = () => openItem({ headSym: p.emp, headEx: p.role, title: p.role, ...p });
+    r.addEventListener('click', open);
+    r.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); open(); } });
+    posTbl.appendChild(r);
+  });
+
+  // Securities table
+  const tbl = document.getElementById('secTable');
+  SECURITIES.forEach((s, i) => {
+    const r = document.createElement('div');
+    r.className = 'sec-row';
+    r.tabIndex = 0;
+    r.innerHTML = `
+      <div class="sym">${s.sym}<span class="ex">${s.ex}</span></div>
+      <div class="desc-c"><div class="nm">${s.nm}</div><div class="tl">${s.tl}</div></div>
+      <div class="stat"><div class="v">${s.stat}</div><div class="k">${s.statk}</div></div>
+      <div class="go">&rsaquo;</div>
+      <div class="peek">${s.syn} <span class="hint">▸ click for full readout</span></div>`;
+    const open = () => openItem({ headSym: s.sym, headEx: s.ex, title: s.nm, ...s });
+    r.addEventListener('click', open);
+    r.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); open(); } });
+    tbl.appendChild(r);
+  });
+
+  // Detail overlay (shared by positions + securities)
+  const overlay = document.getElementById('overlay'), box = document.getElementById('detailBox');
+  function openItem(o) {
+    const isRole = !!o.status;
+    const buildLabel = isRole ? 'Responsibilities' : 'The build';
+    const numLabel = isRole ? 'The highlights' : 'The numbers';
+    const cta = isRole ? 'REQUEST DETAILS' : 'REQUEST FILE';
+    box.innerHTML = `
+      <div class="dhead">
+        <span class="sym">${o.headSym} <span class="desc">${o.headEx}</span></span>
+        <button class="close" aria-label="Close">ESC</button>
+      </div>
+      <div class="dbody">
+        <h3>${o.title}</h3>
+        <p class="syn">${o.syn}</p>
+        <h4>${buildLabel}</h4>
+        <ul>${o.build.map(b=>`<li>${b}</li>`).join('')}</ul>
+        <h4>${numLabel}</h4>
+        <div class="chips">${o.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>
+        <p class="credits">${o.credits}</p>
+        <div class="request"><a class="btn btn-amber" href="mailto:pavanvgopal06@gmail.com?subject=${encodeURIComponent(o.request)}">${cta}</a></div>
+      </div>`;
+    box.querySelector('.close').addEventListener('click', closeDetail);
+    overlay.classList.add('open'); document.body.style.overflow = 'hidden';
+  }
+  function closeDetail() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeDetail(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+  // Keyboard nav: press 1–6 to jump to sections (terminal-style)
+  const navTargets = ['top','experience','work','model','profile','contact'];
+  document.addEventListener('keydown', e => {
+    // ignore if typing in a field or a modifier is held
+    if (e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 6) {
+      const el = document.getElementById(navTargets[n-1]);
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('▸ ' + ['OVERVIEW','EXPERIENCE','WORK','MODEL','PROFILE','CONTACT'][n-1]); }
+    }
+  });
+
+  // Clock
+  function clock() {
+    const d = new Date();
+    document.getElementById('clock').textContent = d.toTimeString().slice(0,8) + ' GMT';
+  }
+  clock(); setInterval(clock, 1000);
+
+  // Typing effect
+  const typedEl = document.getElementById('typed');
+  const word = 'reconciled everything.';
+  let ti = 0;
+  function type() { if (ti <= word.length) { typedEl.textContent = word.slice(0, ti++); setTimeout(type, 55); } }
+  type();
+
+  // Reveals + counters
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  const cio = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting || e.target.dataset.done) return;
+    e.target.dataset.done = 1;
+    const end = +e.target.dataset.count, suf = e.target.dataset.suffix || '', t0 = performance.now(), dur = 1400;
+    const tick = now => { const p = Math.min((now-t0)/dur,1);
+      e.target.textContent = Math.round(end*(1-Math.pow(1-p,3))).toLocaleString() + (p===1?suf:'');
+      if (p<1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }), { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach(c => cio.observe(c));
+
+  // WACC model
+  const W_DEBT = 0.6418, W_EQUITY = 0.3582;
+  const baseNote = 'Beta 1.193 from regressing 60 months of returns vs the FTSE — R2 0.83, built cell by cell. Bond YTM weighted across six maturities, 5 to 30 years.';
+  function waccCalc() {
+    const b=+beta.value, e=+erp.value/100, r=+rf.value/100, y=+ytm.value/100, t=+tax.value/100;
+    betaOut.textContent=b.toFixed(3); erpOut.textContent=(+erp.value).toFixed(1)+'%';
+    rfOut.textContent=(+rf.value).toFixed(2)+'%'; ytmOut.textContent=(+ytm.value).toFixed(2)+'%'; taxOut.textContent=Math.round(+tax.value)+'%';
+    const coe=r+b*e, cod=y*(1-t), w=W_DEBT*cod+W_EQUITY*coe;
+    coeOut.textContent=(coe*100).toFixed(2)+'%'; codOut.textContent=(cod*100).toFixed(2)+'%'; waccVal.innerHTML=(w*100).toFixed(2)+'<span class="pct">%</span>';
+    if (b>=1.75) waccNote.textContent='A beta of '+b.toFixed(2)+' for a regulated utility? Someone\u2019s been reading too many meme-stock forums. The regression says 1.193.';
+    else if (b<=0.65) waccNote.textContent='Beta this low would make National Grid calmer than a savings account. The 60-month regression respectfully disagrees.';
+    else waccNote.textContent=baseNote;
+  }
+  ['beta','erp','rf','ytm','tax'].forEach(id => document.getElementById(id).addEventListener('input', waccCalc));
+  waccCalc();
+
+  // Siuu
+  let sc = 0;
+  const lines = ['SIUUU!','AGAIN!','HAT-TRICK!','THE CROWD GOES WILD','BACK TO THE SPREADSHEETS','PERSISTENCE. THE WHOLE POINT.','COOL COOL COOL COOL','BAZINGA. NOW PULL UP PG:US.'];
+  siuu.addEventListener('click', () => { sc++; siuuCount.textContent = sc; toast(lines[Math.min(sc-1, lines.length-1)]); });
+  function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+</script>
+</body>
+</html>
