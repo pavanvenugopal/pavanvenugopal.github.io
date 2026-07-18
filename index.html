@@ -47,9 +47,9 @@
 
   /* Ticker tape */
   .ticker { background: var(--panel); border-bottom: 1px solid var(--line); overflow: hidden; white-space: nowrap; font-family: var(--mono); font-size: 12.5px; position: sticky; top: 37px; z-index: 55; }
-  .ticker .track { display: inline-block; padding: 8px 0; animation: scroll 42s linear infinite; }
+  .ticker .track { display: inline-block; padding: 8px 0; animation: scroll 42s linear infinite; will-change: transform; backface-visibility: hidden; }
   .ticker:hover .track { animation-play-state: paused; }
-  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes scroll { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
   .ticker .item { display: inline-block; padding: 0 22px; color: var(--muted); }
   .ticker .item b { color: var(--text); font-weight: 500; }
   .ticker .sym { color: var(--amber); }
@@ -109,15 +109,18 @@
   .pos-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .pos-hdr { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px; padding: 11px 22px; background: #000; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; }
   .pos-hdr span:last-child { text-align: right; }
-  .pos-row { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px 16px; align-items: center; padding: 20px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s, box-shadow .18s; position: relative; }
-  .pos-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); transition: width .18s; }
+  .pos-row { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px 16px; align-items: center; padding: 20px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s ease; position: relative; }
+  .pos-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform .18s ease; will-change: transform; }
   .pos-row:last-child { border-bottom: none; }
-  .pos-row:hover { background: var(--panel2); box-shadow: inset 0 0 50px rgba(255,158,27,.05); }
-  .pos-row:hover::before { width: 3px; }
-  .pos-row .peek { grid-column: 1 / -1; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .28s ease, opacity .22s ease, margin-top .28s ease; font-size: 13px; color: var(--muted); }
-  .pos-row:hover .peek { max-height: 70px; opacity: 1; margin-top: 4px; }
+  .pos-row .peek { grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .26s ease, opacity .2s ease; font-size: 13px; color: var(--muted); }
+  .pos-row .peek > span { overflow: hidden; min-height: 0; }
   .pos-row .peek b { color: var(--amber); }
   .pos-row .peek .hint { color: var(--faint); font-family: var(--mono); font-size: 11.5px; }
+  @media (hover: hover) and (pointer: fine) {
+    .pos-row:hover { background: var(--panel2); }
+    .pos-row:hover::before { transform: scaleX(1); }
+    .pos-row:hover .peek { grid-template-rows: 1fr; opacity: 1; }
+  }
   .pos-row .role { font-weight: 600; font-size: 16px; }
   .pos-row .stat-dot { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
   .pos-row .stat-dot.active { color: var(--green); } .pos-row .stat-dot.active .d { animation: pulse 2s ease infinite; }
@@ -130,15 +133,19 @@
 
   /* Securities table */
   .sec-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .sec-row { display: grid; grid-template-columns: 110px 1fr 130px 40px; gap: 16px; align-items: center; padding: 18px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s, box-shadow .18s; position: relative; }
-  .sec-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--amber); transition: width .18s; }
+  .sec-row { display: grid; grid-template-columns: 110px 1fr 130px 40px; gap: 16px; align-items: center; padding: 18px 22px; background: var(--panel); border-bottom: 1px solid var(--line); cursor: pointer; transition: background .18s ease; position: relative; }
+  .sec-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform .18s ease; will-change: transform; }
   .sec-row:last-child { border-bottom: none; }
-  .sec-row:hover { background: var(--panel2); box-shadow: inset 0 0 50px rgba(255,158,27,.05); }
-  .sec-row:hover::before { width: 3px; }
-  .sec-row .peek { grid-column: 1 / -1; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .28s ease, opacity .22s ease, margin-top .28s ease; font-size: 13px; color: var(--muted); }
-  .sec-row:hover .peek { max-height: 70px; opacity: 1; margin-top: 4px; }
+  .sec-row .peek { grid-column: 1 / -1; display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .26s ease, opacity .2s ease; font-size: 13px; color: var(--muted); }
+  .sec-row .peek > span { overflow: hidden; min-height: 0; }
   .sec-row .peek b { color: var(--amber); }
   .sec-row .peek .hint { color: var(--faint); font-family: var(--mono); font-size: 11.5px; }
+  @media (hover: hover) and (pointer: fine) {
+    .sec-row:hover { background: var(--panel2); }
+    .sec-row:hover::before { transform: scaleX(1); }
+    .sec-row:hover .peek { grid-template-rows: 1fr; opacity: 1; }
+    .sec-row:hover .go { color: var(--amber); transform: translateX(3px); }
+  }
   .sec-row .sym { font-family: var(--mono); font-weight: 600; color: var(--amber); font-size: 15px; }
   .sec-row .sym .ex { color: var(--faint); font-size: 11px; display: block; font-weight: 400; margin-top: 2px; }
   .sec-row .desc-c .nm { font-weight: 600; font-size: 16px; }
@@ -218,11 +225,12 @@
   footer .contact-row a:hover { border-color: var(--amber); color: var(--amber); }
   footer .fine { font-family: var(--mono); margin-top: 44px; font-size: 12px; color: var(--faint); }
 
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; will-change: opacity, transform; }
+  .reveal.in { will-change: auto; }
   .reveal.in { opacity: 1; transform: none; }
   #toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--amber); color: #000; font-family: var(--mono); font-weight: 600; padding: 11px 24px; border-radius: 4px; opacity: 0; transition: all .3s; z-index: 200; font-size: 13.5px; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .cursor, .hero .typed::after { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .cursor, .hero .typed::after, .ticker .track { animation: none; } .pos-row .peek, .sec-row .peek, .pos-row::before, .sec-row::before { transition: none; } }
 </style>
 </head>
 <body>
@@ -481,7 +489,7 @@
       </div>
       <div><div class="emp">${p.emp}</div><div class="mandate">${p.mandate}</div></div>
       <div class="tenure"><div class="dt">${p.dates}</div><div class="loc">${p.loc}</div></div>
-      <div class="peek">${p.syn.split('—')[0].split(':').slice(1).join(':').trim() || p.syn} <span class="hint">▸ click for full readout</span></div>`;
+      <div class="peek"><span>${p.syn.split('—')[0].split(':').slice(1).join(':').trim() || p.syn} <span class="hint">▸ click for full readout</span></span></div>`;
     const open = () => openItem({ headSym: p.emp, headEx: p.role, title: p.role, ...p });
     r.addEventListener('click', open);
     r.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); open(); } });
@@ -499,7 +507,7 @@
       <div class="desc-c"><div class="nm">${s.nm}</div><div class="tl">${s.tl}</div></div>
       <div class="stat"><div class="v">${s.stat}</div><div class="k">${s.statk}</div></div>
       <div class="go">&rsaquo;</div>
-      <div class="peek">${s.syn} <span class="hint">▸ click for full readout</span></div>`;
+      <div class="peek"><span>${s.syn} <span class="hint">▸ click for full readout</span></span></div>`;
     const open = () => openItem({ headSym: s.sym, headEx: s.ex, title: s.nm, ...s });
     r.addEventListener('click', open);
     r.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); open(); } });
@@ -566,11 +574,11 @@
   type();
 
   // Reveals + counters
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.12 });
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   const cio = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting || e.target.dataset.done) return;
-    e.target.dataset.done = 1;
+    e.target.dataset.done = 1; cio.unobserve(e.target);
     const end = +e.target.dataset.count, suf = e.target.dataset.suffix || '', t0 = performance.now(), dur = 1400;
     const tick = now => { const p = Math.min((now-t0)/dur,1);
       e.target.textContent = Math.round(end*(1-Math.pow(1-p,3))).toLocaleString() + (p===1?suf:'');
