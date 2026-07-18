@@ -99,6 +99,12 @@
   .sec-head h2 { font-family: var(--mono); font-size: clamp(22px, 3.4vw, 30px); font-weight: 600; letter-spacing: -0.01em; }
   .sec-head .desc { flex-basis: 100%; color: var(--muted); font-size: 15px; margin-top: 4px; }
 
+  /* Focus styling — amber terminal ring instead of the browser's blue default.
+     :focus-visible only shows it for keyboard users, so mouse clicks stay clean. */
+  .pos-row:focus, .sec-row:focus { outline: none; }
+  .pos-row:focus-visible, .sec-row:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+  .pos-row::-moz-focus-inner, .sec-row::-moz-focus-inner { border: 0; }
+
   /* Positions blotter */
   .pos-table { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .pos-hdr { display: grid; grid-template-columns: 220px 1fr 170px; gap: 16px; padding: 11px 22px; background: #000; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; }
@@ -346,6 +352,10 @@
       <div class="field">PILOT_EPISODE</div>
       <p>India to Cork for an MSc in Corporate Finance at UCC. Stayed for the career, the football, and — against all expectations — the weather jokes.</p>
     </div>
+    <div class="pcard reveal">
+      <div class="field">BUILT_WITH</div>
+      <p>This site was designed and built by directing Claude. I don't write JavaScript — but I can scope a build, drive the revisions, and audit the output. The AI wrote the code; the finance, the data and the fact-checking are mine. Every figure traces to a source file, including the few I caught it getting wrong.</p>
+    </div>
   </div>
 </div></section>
 
@@ -358,7 +368,7 @@
     <a href="https://www.linkedin.com/in/pavan-venu-gopal-22bb6631a/" target="_blank" rel="noopener">LINKEDIN</a>
     <a href="Pavan_VenuGopal_CV.pdf" download>DOWNLOAD CV</a>
   </div>
-  <p class="fine">(C) 2026 PAVAN VENU GOPAL &middot; CORK, IE &middot; FULL WORK AUTHORISATION, NO VISA TIMELINE &middot; THE ONLY JUMP SCARE HERE IS AN UNRECONCILED LEDGER.</p>
+  <p class="fine">(C) 2026 PAVAN VENU GOPAL &middot; CORK, IE &middot; FULL WORK AUTHORISATION, NO VISA TIMELINE &middot; BUILT BY DIRECTING CLAUDE, HAND-VERIFIED LINE BY LINE &middot; THE ONLY JUMP SCARE HERE IS AN UNRECONCILED LEDGER.</p>
 </div></footer>
 
 <div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="detail" id="detailBox"></div></div>
@@ -521,7 +531,11 @@
     box.querySelector('.close').addEventListener('click', closeDetail);
     overlay.classList.add('open'); document.body.style.overflow = 'hidden';
   }
-  function closeDetail() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+  function closeDetail() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
   overlay.addEventListener('click', e => { if (e.target === overlay) closeDetail(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 
