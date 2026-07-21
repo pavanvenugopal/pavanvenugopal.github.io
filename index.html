@@ -161,8 +161,17 @@
   .finale { border: 1px solid var(--amber-dim); border-radius: 8px; padding: 40px; background: linear-gradient(135deg, rgba(255,158,27,.06), var(--panel)); }
   .finale .tag { font-family: var(--mono); font-size: 12px; color: var(--amber); border: 1px solid var(--amber-dim); padding: 4px 11px; border-radius: 3px; }
   .finale h3 { font-family: var(--mono); font-size: clamp(22px, 3.4vw, 30px); font-weight: 600; margin: 18px 0 12px; }
-  .finale p { color: var(--muted); max-width: 64ch; }
+  .finale p { color: var(--muted); max-width: 62ch; }
   .finale .req { margin-top: 22px; }
+  .finale .cols { display: grid; grid-template-columns: 1fr 300px; gap: 44px; align-items: start; }
+  @media (max-width: 900px) { .finale .cols { grid-template-columns: 1fr; gap: 30px; } }
+  .readout { border: 1px solid var(--line); border-radius: 6px; background: rgba(0,0,0,.35); overflow: hidden; }
+  .readout .rhead { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--faint); text-transform: uppercase; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #000; }
+  .readout .rrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 16px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12.5px; }
+  .readout .rrow:last-child { border-bottom: none; }
+  .readout .rk { color: var(--muted); }
+  .readout .rv { color: var(--amber); font-weight: 600; }
+  .readout .rv.n { color: var(--text); }
 
   /* Overlay */
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.78); backdrop-filter: blur(3px); z-index: 100; display: none; align-items: flex-start; justify-content: center; padding: 6vh 4vw; overflow-y: auto; }
@@ -300,8 +309,23 @@
   <div class="finale reveal">
     <span class="tag mono">MSc THESIS</span>
     <h3 class="mono">Benchmarking 30 companies across a $450bn industry</h3>
-    <p>My MSc thesis: a large-scale benchmarking study of the global Beauty &amp; Personal Care industry, supervised by Dr Conor Neville. A 30-company comparable analysis on EV/EBITDA (17.6x avg), ESG scores (53.4 avg) and operating metrics, with top-10 deep-dives from P&amp;G to Estée Lauder, performance traced across four market eras, company-by-company sustainability analysis, and the full strategic framework treatment — Porter's Five Forces, SWOT, PESTEL. The full manuscript is available on request.</p>
-    <div class="req"><a class="btn btn-amber" href="mailto:pavanvgopal06@gmail.com?subject=Requesting%20the%20MSc%20thesis%20(Beauty%20%26%20Personal%20Care%20benchmarking)">REQUEST MANUSCRIPT</a></div>
+    <div class="cols">
+      <div>
+        <p>My MSc thesis: a large-scale benchmarking study of the global Beauty &amp; Personal Care industry, supervised by Dr Conor Neville. A 30-company comparable analysis on EV/EBITDA, ESG scores and operating metrics, with top-10 deep-dives from P&amp;G to Estée Lauder, performance traced across four market eras, company-by-company sustainability analysis, and the full strategic framework treatment — Porter's Five Forces, SWOT, PESTEL. The full manuscript is available on request.</p>
+        <div class="req"><a class="btn btn-amber" href="mailto:pavanvgopal06@gmail.com?subject=Requesting%20the%20MSc%20thesis%20(Beauty%20%26%20Personal%20Care%20benchmarking)">REQUEST MANUSCRIPT</a></div>
+      </div>
+      <div class="readout">
+        <div class="rhead">Peer set &middot; key figures</div>
+        <div class="rrow"><span class="rk">Companies analysed</span><span class="rv">30</span></div>
+        <div class="rrow"><span class="rk">Market size</span><span class="rv">$450bn</span></div>
+        <div class="rrow"><span class="rk">EV/EBITDA avg</span><span class="rv n">17.6x</span></div>
+        <div class="rrow"><span class="rk">EV/EBITDA median</span><span class="rv n">14.1x</span></div>
+        <div class="rrow"><span class="rk">ESG score avg</span><span class="rv n">53.4</span></div>
+        <div class="rrow"><span class="rk">Op. margin median</span><span class="rv n">20.8%</span></div>
+        <div class="rrow"><span class="rk">ROIC median</span><span class="rv n">12.9%</span></div>
+        <div class="rrow"><span class="rk">Forecast CAGR to 2030</span><span class="rv">~5%</span></div>
+      </div>
+    </div>
   </div>
 </div></section>
 
