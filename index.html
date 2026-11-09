@@ -252,9 +252,161 @@
   #toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--amber); color: #000; font-family: var(--mono); font-weight: 600; padding: 11px 24px; border-radius: 4px; opacity: 0; transition: all .3s; z-index: 200; font-size: 13.5px; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .cursor, .hero .typed::after, .ticker .track { animation: none; } .pos-row .peek, .sec-row .peek, .pos-row::before, .sec-row::before { transition: none; } }
+
+  /* =========================================================
+     GLASS LAYER — Apple-style tinted glass over the terminal.
+     Real backdrop blur on the sticky bars, small cards, buttons
+     and the detail panel; lighter "faux glass" on the big panels
+     so scrolling stays smooth.
+     ========================================================= */
+  :root {
+    --glass-tint: rgba(17, 19, 26, .52);
+    --glass-tint-strong: rgba(12, 13, 18, .68);
+    --glass-edge: rgba(255, 255, 255, .10);
+    --glass-edge-hi: rgba(255, 255, 255, .18);
+    --glass-sheen: linear-gradient(160deg, rgba(255,255,255,.085) 0%, rgba(255,158,27,.035) 28%, rgba(255,255,255,.012) 60%, rgba(255,255,255,.02) 100%);
+    --glass-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.25), 0 22px 44px -22px rgba(0,0,0,.7);
+    --blur: blur(20px) saturate(165%);
+  }
+  body { background-image: none; }
+  section, header.hero, footer { scroll-margin-top: 118px; }
+
+  /* Ambient light the glass sits on */
+  .ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .ambient span { position: absolute; border-radius: 50%; }
+  .ambient span:nth-child(1) { width: 70vmax; height: 70vmax; left: -22vmax; top: -30vmax; background: radial-gradient(circle, rgba(255,158,27,.22), rgba(255,158,27,0) 62%); }
+  .ambient span:nth-child(2) { width: 60vmax; height: 60vmax; right: -24vmax; top: 18vh; background: radial-gradient(circle, rgba(77,159,255,.16), rgba(77,159,255,0) 62%); }
+  .ambient span:nth-child(3) { width: 55vmax; height: 55vmax; left: 10vw; bottom: -34vmax; background: radial-gradient(circle, rgba(38,208,124,.10), rgba(38,208,124,0) 62%); }
+  .ambient::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px); background-size: 3px 3px; opacity: .5; }
+
+  /* Sticky bars: frosted glass */
+  .termbar, .fkeys { background: rgba(6, 7, 10, .55); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border-bottom-color: var(--glass-edge); }
+  .ticker { background: rgba(18, 20, 27, .45); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); border-bottom-color: var(--glass-edge); }
+  .fkeys a { border-radius: 8px 8px 0 0; }
+  .fkeys a:hover { background: rgba(255,255,255,.06); }
+
+  /* Shared glass surfaces */
+  .metric, .pcard, .pos-table, .sec-table, .model, .finale, .detail {
+    background: var(--glass-sheen), var(--glass-tint);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--glass-shadow);
+  }
+  .metric { border-radius: 16px; transition: opacity .6s ease, transform .4s ease, border-color .25s ease; }
+  .pcard { border-radius: 18px; transition: opacity .6s ease, transform .4s ease, border-color .25s ease; }
+  .pos-table, .sec-table, .model { border-radius: 18px; }
+  .finale { border-radius: 22px; background: linear-gradient(135deg, rgba(255,158,27,.10), rgba(255,158,27,0) 55%), var(--glass-sheen), var(--glass-tint); border-color: rgba(255,158,27,.28); }
+  @media (hover: hover) and (pointer: fine) {
+    .metric:hover, .pcard:hover { transform: translateY(-3px); border-color: var(--glass-edge-hi); }
+    .pcard:hover { border-color: rgba(255,158,27,.35); }
+  }
+  /* real blur only on the smaller cards (desktop) */
+  @media (min-width: 900px) {
+    .metric, .pcard { -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur); }
+  }
+
+  /* Rows sit on the glass instead of solid panels */
+  .pos-hdr { background: rgba(0,0,0,.28); border-bottom-color: var(--glass-edge); }
+  .pos-row, .sec-row { background: transparent; border-bottom-color: rgba(255,255,255,.06); }
+  @media (hover: hover) and (pointer: fine) {
+    .pos-row:hover, .sec-row:hover { background: rgba(255,255,255,.045); }
+  }
+  .model .mhead { background: rgba(255,255,255,.035); border-bottom-color: var(--glass-edge); }
+  .fdiv { background: var(--glass-edge); }
+
+  /* Detail panel: the most "Apple" moment */
+  .overlay { background: rgba(4,5,8,.55); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
+  .detail { border-radius: 22px; background: var(--glass-sheen), var(--glass-tint-strong); -webkit-backdrop-filter: blur(28px) saturate(170%); backdrop-filter: blur(28px) saturate(170%); border-color: var(--glass-edge-hi); }
+  .detail .dhead { background: rgba(0,0,0,.25); border-radius: 22px 22px 0 0; border-bottom-color: var(--glass-edge); }
+  .detail li { border-bottom-color: rgba(255,255,255,.06); }
+  .detail .close { border-radius: 10px; background: rgba(255,255,255,.05); border-color: var(--glass-edge); }
+  .chip { background: rgba(255,255,255,.05); border-color: var(--glass-edge); border-radius: 999px; }
+  .credits { background: rgba(0,0,0,.25); border-color: var(--glass-edge); border-radius: 14px; }
+
+  /* Glass buttons and pills */
+  .btn, footer .contact-row a, .siuu-btn {
+    background: rgba(255,255,255,.06); border: 1px solid var(--glass-edge-hi); border-radius: 12px;
+    -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 10px 24px -14px rgba(0,0,0,.8);
+  }
+  .btn-amber { background: linear-gradient(180deg, #ffb54d, #ff9e1b 60%, #f08f0c); color: #000; border-color: rgba(255,200,120,.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.18), 0 12px 30px -10px rgba(255,158,27,.55); }
+  .btn-amber:hover { background: linear-gradient(180deg, #ffc366, #ffab33 60%, #ff9e1b); }
+  .sec-head .fkey { border-radius: 7px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5); }
+  .finale .tag { border-radius: 999px; background: rgba(255,158,27,.08); }
+  .peers .ptags span { border-radius: 999px; background: rgba(255,255,255,.04); border-color: var(--glass-edge); }
+  footer { border-top-color: var(--glass-edge); }
+  #toast { border-radius: 999px; background: linear-gradient(180deg, #ffb54d, #ff9e1b); box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 14px 30px -10px rgba(255,158,27,.6); }
+
+  /* Accessibility + fallbacks */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .termbar, .fkeys { background: rgba(6,7,10,.94); } .ticker { background: rgba(18,20,27,.94); }
+    .detail { background: var(--glass-sheen), #13151c; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .termbar, .fkeys, .ticker { background: #050608; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .metric, .pcard, .pos-table, .sec-table, .model, .finale, .detail { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  }
+
+  /* =========================================================
+     OPENING — terminal boot, then the glass settles into place.
+     Plays once per visit, skippable, off for reduced motion.
+     ========================================================= */
+  #boot { display: none; position: fixed; inset: 0; z-index: 300; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+    padding: 24px max(16px, 4vw); background: radial-gradient(ellipse at 50% 40%, rgba(255,158,27,.10), transparent 60%), #07080b; cursor: pointer; }
+  html.booting #boot { display: flex; animation: bootSafety .6s ease 4.6s forwards; }
+  html.booting body { overflow: hidden; }
+  @keyframes bootSafety { to { opacity: 0; visibility: hidden; } }
+  #boot .log { font-family: var(--mono); font-size: clamp(11.5px, 1.6vw, 13.5px); color: var(--muted); width: min(600px, 100%); min-height: 9.5em; line-height: 1.75; }
+  #boot .bl { opacity: 0; transform: translateY(4px); animation: blIn .22s ease forwards; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #boot .bl .ok { color: var(--green); } #boot .bl .am { color: var(--amber); } #boot .bl .dim { color: var(--faint); }
+  @keyframes blIn { to { opacity: 1; transform: none; } }
+  #boot .bname { font-family: var(--mono); font-weight: 600; font-size: clamp(30px, 7vw, 76px); letter-spacing: -0.02em; color: var(--text); text-align: center; line-height: 1;
+    opacity: 0; filter: blur(14px); transform: scale(.96); transition: opacity .55s ease, filter .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+    text-shadow: 0 0 50px rgba(255,158,27,.25); }
+  #boot .bname .amber { color: var(--amber); }
+  #boot.named .bname { opacity: 1; filter: none; transform: none; }
+  #boot .skip { position: absolute; right: max(16px, 4vw); bottom: calc(22px + env(safe-area-inset-bottom, 0px)); font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; color: var(--muted);
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+  #boot .skip:hover { color: var(--amber); border-color: rgba(255,158,27,.5); }
+  #boot.lift { display: flex; animation: none; pointer-events: none; opacity: 0; transform: scale(1.03); filter: blur(10px);
+    transition: opacity .45s ease, transform .6s cubic-bezier(.2,.7,.2,1), filter .45s ease; }
+
+  /* Site entrance after the boot */
+  @keyframes heroIn { from { opacity: 0; transform: translateY(18px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes barIn { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
+  html.booting .hero .nameplate, html.booting .hero h1, html.booting .hero .sub, html.booting .hero .cta-row,
+  html.booting .termbar, html.booting .ticker, html.booting .fkeys { opacity: 0; animation: heroIn .7s ease 4.8s forwards; }
+  html.enter .termbar { animation: barIn .55s cubic-bezier(.2,.7,.2,1) both; }
+  html.enter .ticker  { animation: barIn .55s cubic-bezier(.2,.7,.2,1) .06s both; }
+  html.enter .fkeys   { animation: barIn .55s cubic-bezier(.2,.7,.2,1) .12s both; }
+  html.enter .hero .nameplate { animation: heroIn .9s cubic-bezier(.2,.7,.2,1) .15s both; }
+  html.enter .hero h1        { animation: heroIn .8s cubic-bezier(.2,.7,.2,1) .32s both; }
+  html.enter .hero .sub      { animation: heroIn .8s cubic-bezier(.2,.7,.2,1) .44s both; }
+  html.enter .hero .cta-row  { animation: heroIn .8s cubic-bezier(.2,.7,.2,1) .56s both; }
+  @media (prefers-reduced-motion: reduce) {
+    html.enter .termbar, html.enter .ticker, html.enter .fkeys, html.enter .hero .nameplate, html.enter .hero h1, html.enter .hero .sub, html.enter .hero .cta-row { animation: none; }
+    .metric, .pcard { transition: none; }
+  }
 </style>
+<script>
+  /* Decide before first paint whether the boot intro plays (once per visit). */
+  (function () {
+    try {
+      var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced && !sessionStorage.getItem('pvgBooted')) document.documentElement.classList.add('booting');
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+
+<div class="ambient" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<div id="boot" aria-hidden="true">
+  <div class="log" id="bootLog"></div>
+  <div class="bname">PAVAN VENU GOPAL<span class="amber">.</span></div>
+  <button class="skip" id="bootSkip" type="button">SKIP &rsaquo;</button>
+</div>
 
 <div class="termbar"><div class="inner">
   <span class="cmd">PVG<span class="go">GO</span><span class="cursor"></span></span>
@@ -640,7 +792,8 @@
   const word = 'reconciled everything.';
   let ti = 0;
   function type() { if (ti <= word.length) { typedEl.textContent = word.slice(0, ti++); setTimeout(type, 55); } }
-  type();
+  let typingStarted = false;
+  function startTyping() { if (typingStarted) return; typingStarted = true; type(); }
 
   // Reveals + counters
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.12 });
@@ -677,6 +830,51 @@
   const lines = ['SIUUU!','AGAIN!','HAT-TRICK!','THE CROWD GOES WILD','BACK TO THE SPREADSHEETS','PERSISTENCE. THE WHOLE POINT.','COOL COOL COOL COOL','BAZINGA. NOW PULL UP PG:US.'];
   siuu.addEventListener('click', () => { sc++; siuuCount.textContent = sc; toast(lines[Math.min(sc-1, lines.length-1)]); });
   function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+
+  // Opening: terminal boot sequence, then the glass settles in
+  (function () {
+    const html = document.documentElement;
+    const boot = document.getElementById('boot');
+    function enter() {
+      html.classList.remove('booting');
+      html.classList.add('enter');
+      setTimeout(startTyping, 450);
+    }
+    if (!html.classList.contains('booting')) { if (boot) boot.remove(); enter(); return; }
+    try { sessionStorage.setItem('pvgBooted', '1'); } catch (e) {}
+
+    const lines = [
+      '<span class="am">PVG TERMINAL</span> <span class="dim">v2.6 · CORK, IE · ' + new Date().toTimeString().slice(0,5) + ' GMT</span>',
+      '&gt; LOADING POSITIONS <span class="dim">.............</span> <span class="ok">OK</span>',
+      '&gt; RECONCILING LEDGER <span class="dim">............</span> <span class="ok">0 BREAKS</span>',
+      '&gt; PRICING NG:LN WACC <span class="dim">............</span> <span class="am">6.05%</span>',
+      '&gt; RUNNING 1,000 SIMULATIONS <span class="dim">.....</span> <span class="ok">DONE</span>',
+      '&gt; AUTHENTICATING USER <span class="dim">...........</span> <span class="ok">VERIFIED</span>'
+    ];
+    const log = document.getElementById('bootLog');
+    let i = 0, done = false;
+    function finish() {
+      if (done) return; done = true;
+      boot.classList.add('named', 'lift');
+      setTimeout(enter, 280);
+      setTimeout(() => boot.remove(), 700);
+    }
+    function next() {
+      if (done) return;
+      if (i < lines.length) {
+        const row = document.createElement('div');
+        row.className = 'bl'; row.innerHTML = lines[i++];
+        log.appendChild(row);
+        setTimeout(next, 200);
+      } else {
+        boot.classList.add('named');
+        setTimeout(finish, 900);
+      }
+    }
+    setTimeout(next, 180);
+    boot.addEventListener('click', finish);
+    document.addEventListener('keydown', function onKey() { finish(); document.removeEventListener('keydown', onKey); });
+  })();
 </script>
 </body>
 </html>
